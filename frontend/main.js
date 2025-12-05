@@ -1,6 +1,6 @@
 const CELL_SIZE = 8; // px
-const GRID_SIZE = 100; // 100x100
-const CANVAS_SIZE = CELL_SIZE * GRID_SIZE; // 800
+const GRID_SIZE = 20; // 20x20
+const CANVAS_SIZE = CELL_SIZE * GRID_SIZE; // 160
 const TICKS_PER_SECOND = 20; // game logic ticks per second (2x faster)
 const MS_PER_TICK = 1000 / TICKS_PER_SECOND;
 
@@ -18,13 +18,36 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const resumeBtn = document.getElementById('resumeBtn');
 
-// Audio (simple HTMLAudio fallback)
-const sounds = {
-  eat: new Audio('/static/sounds/eat.wav'),
-  die: new Audio('/static/sounds/die.wav'),
-  pause: new Audio('/static/sounds/pause.wav')
-};
+// Audio (simple Web Audio API synthesized beeps)
+let audioContext = null;
 let audioEnabled = false;
+
+function initAudio() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function playBeep(freq = 800, duration = 100, volume = 0.3) {
+  if (!audioEnabled || !audioContext) return;
+  try {
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(volume, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+    osc.start(audioContext.currentTime);
+    osc.stop(audioContext.currentTime + duration / 1000);
+  } catch (e) {}
+}
+
+const sounds = {
+  eat: () => playBeep(1200, 100, 0.3),
+  die: () => playBeep(400, 300, 0.3),
+  pause: () => playBeep(600, 80, 0.2)
+};
 
 // Input handling
 const DIRECTIONS = {
@@ -43,7 +66,7 @@ let lastKey = null;
 
 window.addEventListener('keydown', (e) => {
   // enable audio on first interaction
-  if (!audioEnabled) { audioEnabled = true; Object.values(sounds).forEach(s => { s.volume = 0.8; } ); }
+  if (!audioEnabled) { audioEnabled = true; initAudio(); }
 
   const key = e.key;
   if (key === 'p' || key === 'P' || key === 'Escape') {
@@ -110,7 +133,7 @@ function tick() {
   // collision with borders (kill zone)
   if (newHeadX < 0 || newHeadX >= GRID_SIZE || newHeadY < 0 || newHeadY >= GRID_SIZE) {
     gameOver = true;
-    if (audioEnabled) sounds.die.play();
+    if (audioEnabled) sounds.die();
     overlayTitle.textContent = 'Game Over';
     overlay.classList.remove('hidden');
     if (score > highscore) { highscore = score; saveHighscore(highscore); highEl.textContent = `High: ${highscore}`; }
@@ -122,7 +145,7 @@ function tick() {
   // collision with self
   if (snake.some(seg => seg[0] === newHead[0] && seg[1] === newHead[1])) {
     gameOver = true;
-    if (audioEnabled) sounds.die.play();
+    if (audioEnabled) sounds.die();
     overlayTitle.textContent = 'Game Over';
     overlay.classList.remove('hidden');
     if (score > highscore) { highscore = score; saveHighscore(highscore); highEl.textContent = `High: ${highscore}`; }
@@ -135,7 +158,7 @@ function tick() {
   if (newHead[0] === food[0] && newHead[1] === food[1]) {
     score += 1;
     scoreEl.textContent = `Score: ${score}`;
-    if (audioEnabled) sounds.eat.play();
+    if (audioEnabled) sounds.eat();
     food = spawnFood();
   } else {
     snake.pop();
@@ -192,10 +215,10 @@ function togglePause(){
   if (paused) {
     overlayTitle.textContent = 'Paused';
     overlay.classList.remove('hidden');
-    if (audioEnabled) sounds.pause.play();
+    if (audioEnabled) sounds.pause();
   } else {
     overlay.classList.add('hidden');
-    if (audioEnabled) sounds.pause.play();
+    if (audioEnabled) sounds.pause();
     // reset timing so we don't get a big delta
     lastTick = performance.now();
     accumulator = 0;
@@ -222,7 +245,7 @@ resumeBtn.addEventListener('click', () => {
 });
 
 // click canvas to focus and enable audio on first click
-canvas.addEventListener('mousedown', () => { canvas.focus(); if (!audioEnabled) audioEnabled = true; });
+canvas.addEventListener('mousedown', () => { canvas.focus(); if (!audioEnabled) { audioEnabled = true; initAudio(); } });
 
 // start
 scoreEl.textContent = `Score: ${score}`;
