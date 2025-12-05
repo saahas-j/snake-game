@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Snake</h1>
+      <div id="hud">
+        <span id="score">Score: 0</span>
+        <span id="highscore">High: 0</span>
+        <button id="pauseBtn">Pause</button>
+      </div>
+    </header>
+
+    <main>
+      <canvas id="gameCanvas" width="800" height="800" tabindex="0"></canvas>
+      <div id="overlay" class="hidden">
+        <div id="overlay-content">
+          <h2 id="overlay-title">Paused</h2>
+          <button id="resumeBtn">Resume</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <small>Controls: Arrow keys or WASD. Press P to pause.</small>
+    </footer>
+  </div>
+
+  <script type="module" src="/static/main.js"></script>
+</body>
+</html>
