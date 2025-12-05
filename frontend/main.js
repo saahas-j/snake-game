@@ -1,7 +1,7 @@
-const CELL_SIZE = 8; // px
+const CELL_SIZE = 40; // px (5x larger)
 const GRID_SIZE = 20; // 20x20
-const CANVAS_SIZE = CELL_SIZE * GRID_SIZE; // 160
-const TICKS_PER_SECOND = 20; // game logic ticks per second (2x faster)
+const CANVAS_SIZE = CELL_SIZE * GRID_SIZE; // 800
+const TICKS_PER_SECOND = 10; // game logic ticks per second
 const MS_PER_TICK = 1000 / TICKS_PER_SECOND;
 
 const canvas = document.getElementById('gameCanvas');
