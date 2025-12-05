@@ -31,10 +31,3 @@ uvicorn backend.app:app --reload --host 127.0.0.1 --port 8000
 4. Open `http://127.0.0.1:8000` in your browser.
 
 Gameplay
-- Controls: Arrow keys or WASD. Press `P` or `Escape` to pause/resume.
-- Double-click canvas after game over to restart.
-- Sounds: place `eat.wav`, `die.wav`, and `pause.wav` in `frontend/sounds/`.
-
-Notes
-- The game logic runs at 10 ticks per second and renders at 60 fps with simple interpolation for smoother motion.
-- If you want server-side high-score storage later, I can add a `POST /highscore` endpoint that appends to a server-side JSON file.
