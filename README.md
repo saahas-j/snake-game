@@ -30,4 +30,3 @@ uvicorn backend.app:app --reload --host 127.0.0.1 --port 8000
 
 4. Open `http://127.0.0.1:8000` in your browser.
 
-Gameplay
