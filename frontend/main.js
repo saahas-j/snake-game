@@ -202,8 +202,24 @@ function togglePause(){
   }
 }
 
+function restartGame(){
+  snake = makeEmptySnake();
+  dir = [1,0];
+  food = spawnFood();
+  score = 0;
+  gameOver = false;
+  scoreEl.textContent = `Score: ${score}`;
+  overlay.classList.add('hidden');
+}
+
 pauseBtn.addEventListener('click', togglePause);
-resumeBtn.addEventListener('click', togglePause);
+resumeBtn.addEventListener('click', () => {
+  if (gameOver) {
+    restartGame();
+  } else {
+    togglePause();
+  }
+});
 
 // click canvas to focus and enable audio on first click
 canvas.addEventListener('mousedown', () => { canvas.focus(); if (!audioEnabled) audioEnabled = true; });
